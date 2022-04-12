@@ -1,65 +1,65 @@
 #include<stdio.h>
-#include<windows.h>
-#include<conio.h>
-#define ROW 9
-#define COL 11
-char map [ROW][COL+1]={
-	{"*#*********"},
-	{"***###*###*"},
-	{"###**#****#"},
-	{"*#**###**#*"},
-	{"***********"},
-	{"#####*##*##"},
-	{"**#*****#*E"}, 
-	{"***#*###**#"},
-	{"*#*********"},
-};
- void print_map()
- {
-	 for(int i=0;i<ROW;i++)
-	 {
-		 puts(map[i]);
-	 }
- }
- void show_cursor(int x,int y)
- {
-	 COORD pos;
-	 pos.X=x;
-	 pos.Y=y;
-	 printf("curX=%d,curY=%d\n",x,y);
-	 SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),pos); 
- }
- int curX,curY;
+#include<stdlib.h>
+
+char* getOperand(char* p, double* pnum);
 int main()
 {
-	while(1)
+	char exp[]="1-2.5*4+10.2/5.1";
+	char * p = exp, op[20];
+	int i = 0, j = 0, k = 0;
+	double temp, operand[20], result;
+	while (*p != '\0')
 	{
-		system("cls");
-		print_map();
-		show_cursor(curX,curY);
-		char t=getch();
-			if(t=='w')
-			{
-	//向上走
-	if((curY-1)>=0 && (map[curY-1][curX]=='*' || map[curY-1][curX]=='E')) curY--;
-			}
-			else if(t=='s')
-			{
-                       //向下走                                 
-				if((curY+1)<ROW && (map[curY+1][curX]=='*' || map[curY+1][curX]=='E')) curY++;
-			}
-		else if(t=='a')
-			{
-			//向左走
-if((curX-1)>=0 && (map[curY][curX+1]=='*' || map[curY][curX-1]=='E')) curX--;
-			}
-			else if(t=='d')
-			{
-				//向右走
-				if((curX+1)<COL && (map[curY][curX+1]=='*' || map[curY][curX+1]=='E')) curX++;
+		if (*p >= '0' && *p <= '9')
+		{
+			p = getOperand(p, &temp);
+			operand[j++] = temp;
+			continue;
+		}
+		else if (*p == '+' || *p == '-')
+		{
+			op[k++] = *p;
+		}
+		else if (*p == '*')
+		{
+			p = getOperand(++p, &temp);
+			operand[j - 1] *= temp;
+			continue;
+		}
+		else if (*p == '/')
+		{
+			p=getOperand(++p,&temp);
+			operand[j-1]/=temp;
+			continue;
+		}
+		p++;
 	}
-			if(map[curY][curX]=='E')
-break;
+	result=operand[0];
+		for (i = 0; i < k; i++)
+		{
+			switch (op[i])
+			{
+			case '+':
+					result += operand[i + 1];
+					break;
+			case  '-':
+					result -= operand[i + 1];
+					break;
+			}
+		}
+	printf("result:%.21f\n", result);
+	return 0;
+}
+
+char* getOperand(char* p, double* pnum)
+{
+	char buffer[20];
+	int i = 0;
+	while (*p >= '0' && *p <= '9' || *p == '.')
+	{
+		buffer[i++] = *p++;
 	}
-return 0;
- }
+	buffer[i] = '\0';
+	*pnum = atof(buffer);
+	return p;
+}
